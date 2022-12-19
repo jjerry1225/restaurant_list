@@ -8,11 +8,12 @@ const exphbs = require("express-handlebars");
 
 // 其他變數與資料
 const port = 3000;
-const restaurantList = require("./restaurant.json");
+const Restaurant = require("./models/restaurant");
 
 // express-handlebars設定
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
+app.use(express.urlencoded({ extended: true }))
 
 // setting static files
 app.use(express.static("public"));
@@ -23,7 +24,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // connect to mongoose
-mongoose.set('strictQuery', true);
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -40,28 +40,49 @@ db.once("open", () => {
   console.log("mongodb connected!");
 });
 
-// route setting
+// route setting：瀏覽頁面
 app.get("/", (req, res) => {
-  res.render("index", { restaurants: restaurantList.results });
+  Restaurant.find({})
+    .lean()
+    .then((restaurantData) => res.render("index", { restaurantData }))
+    .catch((error) => console.log(error));
 });
 
+// route setting：搜尋
 app.get("/search", (req, res) => {
+  if (!req.query.keyword) {
+    res.redirect("/");
+  }
+
   const keywords = req.query.keyword.toLocaleLowerCase().trim();
-
-  const restaurants = restaurantList.results.filter(
-    (item) =>
-      item.name.toLocaleLowerCase().includes(keywords) ||
-      item.category.includes(keywords)
-  );
-
-  res.render("index", { restaurants: restaurants, keyword: req.query.keyword });
+  Restaurant.find({})
+    .lean()
+    .then((restaurantData) => {
+      const filterRestaurantsData = restaurantData.filter(
+        (data) =>
+          data.name.toLowerCase().includes(keywords) ||
+          data.category.includes(keywords)
+      );
+      res.render("index", {
+        restaurantData: filterRestaurantsData,
+        keyword: req.query.keyword,
+      });
+    })
+    .catch((error) => console.log(error));
 });
 
+// route setting：show出餐廳詳細資訊
 app.get("/restaurants/:restaurant_id", (req, res) => {
-  const restaurant = restaurantList.results.filter(
-    (item) => item.id.toString() === req.params.restaurant_id
-  );
-  res.render("show", { restaurant: restaurant[0] });
+  const restaurant_id = req.params.id;
+  Restaurant.findById(restaurant_id)
+    .lean()
+    .then((restaurantData) => res.render("show", { restaurantData }))
+    .catch((err) => console.log(err));
+});
+
+// route setting：新增
+app.get("/restaurants/new", (req, res) => {
+  res.render("new");
 });
 
 // listen and start the express server
