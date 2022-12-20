@@ -51,7 +51,7 @@ app.get("/", (req, res) => {
 // route setting：搜尋
 app.get("/search", (req, res) => {
   if (!req.query.keyword) {
-    res.redirect("/");
+    return res.redirect("/");
   }
 
   const keywords = req.query.keyword.toLocaleLowerCase().trim();
@@ -71,6 +71,20 @@ app.get("/search", (req, res) => {
     .catch((error) => console.log(error));
 });
 
+// route setting：新增，轉至新增頁面
+app.get("/restaurants/new", (req, res) => {
+  console.log('new one')
+  res.render("new");
+});
+
+// route setting：新增餐廳
+app.post('/restaurants', (req, res) => {
+  const newRestaurant = req.body
+  Restaurant.create(newRestaurant)
+    .then(() => res.redirect("/"))
+    .catch(err => console.log(err))
+})
+
 // route setting：show出餐廳詳細資訊
 app.get("/restaurants/:restaurant_id", (req, res) => {
   const restaurant_id = req.params.id;
@@ -78,11 +92,6 @@ app.get("/restaurants/:restaurant_id", (req, res) => {
     .lean()
     .then((restaurantData) => res.render("show", { restaurantData }))
     .catch((err) => console.log(err));
-});
-
-// route setting：新增
-app.get("/restaurants/new", (req, res) => {
-  res.render("new");
 });
 
 // listen and start the express server
