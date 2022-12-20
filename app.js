@@ -123,6 +123,17 @@ app.post('/restaurants/:restaurant_id/edit', (req, res) => {
     .catch((err) => console.log(err));
 })
 
+// route setting：刪除餐廳，method = 'POST'
+app.post('/restaurants/:restaurant_id/delete', (req, res) => {
+  const id = req.params.restaurant_id;
+  Restaurant.findById(id)
+    .then((restaurantData) => {
+      restaurantData.remove();
+    })
+    .then(() => res.redirect('/'))
+    .catch((err) => console.log(err));
+})
+
 // listen and start the express server
 app.listen(port, (req, res) => {
   console.log(`Express is listening on http://localhost:${port}`);
