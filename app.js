@@ -1,7 +1,7 @@
-// 套用express
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const methodOverride = require('method-override')
 
 // 套用express-handlebars
 const exphbs = require("express-handlebars");
@@ -17,6 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // setting static files
 app.use(express.static("public"));
+
+// 套用method-override
+app.use(methodOverride('_method'))
 
 // 加入這段 code, 僅在非正式環境時, 使用 dotenv
 if (process.env.NODE_ENV !== "production") {
@@ -73,7 +76,6 @@ app.get("/search", (req, res) => {
 
 // route setting：新增，轉至新增頁面
 app.get("/restaurants/new", (req, res) => {
-  console.log("new one");
   res.render("new");
 });
 
@@ -103,8 +105,8 @@ app.get("/restaurants/:restaurant_id/edit", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-// route setting：編輯餐廳，method = 'POST'
-app.post('/restaurants/:restaurant_id/edit', (req, res) => {
+// route setting：編輯餐廳，method = 'PUT'
+app.put('/restaurants/:restaurant_id', (req, res) => {
   const id = req.params.restaurant_id;
   Restaurant.findById(id)
     .then((restaurantData) => {
@@ -123,8 +125,8 @@ app.post('/restaurants/:restaurant_id/edit', (req, res) => {
     .catch((err) => console.log(err));
 })
 
-// route setting：刪除餐廳，method = 'POST'
-app.post('/restaurants/:restaurant_id/delete', (req, res) => {
+// route setting：刪除餐廳，method = 'DELETE'
+app.delete('/restaurants/:restaurant_id', (req, res) => {
   const id = req.params.restaurant_id;
   Restaurant.findById(id)
     .then((restaurantData) => {
