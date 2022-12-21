@@ -1,14 +1,16 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const methodOverride = require('method-override')
+const methodOverride = require("method-override");
+
+// 引用路由器，路徑設定為 /routes 就會自動去尋找目錄下叫做 index 的檔案。
+const routes = require("./routes");
 
 // 套用express-handlebars
 const exphbs = require("express-handlebars");
 
 // 其他變數與資料
 const port = 3000;
-const Restaurant = require("./models/restaurant");
 
 // express-handlebars設定
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
@@ -19,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // 套用method-override
-app.use(methodOverride('_method'))
+app.use(methodOverride("_method"));
 
 // 加入這段 code, 僅在非正式環境時, 使用 dotenv
 if (process.env.NODE_ENV !== "production") {
@@ -43,98 +45,8 @@ db.once("open", () => {
   console.log("mongodb connected!");
 });
 
-// route setting：瀏覽頁面
-app.get("/", (req, res) => {
-  Restaurant.find({})
-    .lean()
-    .then((restaurantData) => res.render("index", { restaurantData }))
-    .catch((error) => console.log(error));
-});
-
-// route setting：搜尋
-app.get("/search", (req, res) => {
-  if (!req.query.keyword) {
-    return res.redirect("/");
-  }
-
-  const keywords = req.query.keyword.toLocaleLowerCase().trim();
-  Restaurant.find({})
-    .lean()
-    .then((restaurantData) => {
-      const filterRestaurantsData = restaurantData.filter(
-        (data) =>
-          data.name.toLowerCase().includes(keywords) ||
-          data.category.includes(keywords)
-      );
-      res.render("index", {
-        restaurantData: filterRestaurantsData,
-        keyword: req.query.keyword,
-      });
-    })
-    .catch((error) => console.log(error));
-});
-
-// route setting：新增，轉至新增頁面
-app.get("/restaurants/new", (req, res) => {
-  res.render("new");
-});
-
-// route setting：新增餐廳，method = 'POST'
-app.post("/restaurants", (req, res) => {
-  const newRestaurant = req.body;
-  Restaurant.create(newRestaurant)
-    .then(() => res.redirect("/"))
-    .catch((err) => console.log(err));
-});
-
-// route setting：show出餐廳詳細資訊
-app.get("/restaurants/:restaurant_id", (req, res) => {
-  const id = req.params.restaurant_id;
-  Restaurant.findById(id)
-    .lean()
-    .then((restaurantData) => res.render("show", { restaurantData }))
-    .catch((err) => console.log(err));
-});
-
-// route setting：編輯餐廳，轉至編輯頁面
-app.get("/restaurants/:restaurant_id/edit", (req, res) => {
-  const id = req.params.restaurant_id;
-  Restaurant.findById(id)
-    .lean()
-    .then((restaurantData) => res.render("edit", { restaurantData }))
-    .catch((err) => console.log(err));
-});
-
-// route setting：編輯餐廳，method = 'PUT'
-app.put('/restaurants/:restaurant_id', (req, res) => {
-  const id = req.params.restaurant_id;
-  Restaurant.findById(id)
-    .then((restaurantData) => {
-      restaurantData.name = req.body.name;
-      restaurantData.name_en = req.body.name_en;
-      restaurantData.category = req.body.category;
-      restaurantData.image = req.body.image;
-      restaurantData.location = req.body.location;
-      restaurantData.phone = req.body.phone;
-      restaurantData.google_map = req.body.google_map;
-      restaurantData.rating = req.body.rating;
-      restaurantData.description = req.body.description;
-      return restaurantData.save();
-    })
-    .then(() => res.redirect(`/restaurants/${id}`))
-    .catch((err) => console.log(err));
-})
-
-// route setting：刪除餐廳，method = 'DELETE'
-app.delete('/restaurants/:restaurant_id', (req, res) => {
-  const id = req.params.restaurant_id;
-  Restaurant.findById(id)
-    .then((restaurantData) => {
-      restaurantData.remove();
-    })
-    .then(() => res.redirect('/'))
-    .catch((err) => console.log(err));
-})
+// route setting
+app.use(routes);
 
 // listen and start the express server
 app.listen(port, (req, res) => {
