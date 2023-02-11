@@ -10,8 +10,8 @@ router.get("/", (req, res) => {
   if (!req.query.keyword) {
     return res.redirect("/");
   }
-  
-  const userId = req.user._id
+
+  const userId = req.user._id;
   const keywords = req.query.keyword.toLocaleLowerCase().trim();
   Restaurant.find({ userId })
     .lean()
