@@ -7,6 +7,10 @@ const flash = require("connect-flash")
 // 載入設定檔，要寫在 express-session 以後
 const usePassport = require("./config/passport")
 
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 // 引用連線mongoose的檔案，對 app.js 而言，Mongoose 連線設定只需要「被執行」，不需要接到任何回傳參數繼續利用，所以這裡不需要再設定變數。
 require('./config/mongoose')
 
@@ -17,7 +21,7 @@ const routes = require("./routes");
 const exphbs = require("express-handlebars");
 
 // 其他變數與資料
-const port = 3000;
+const port = process.env.PORT;
 
 // express-handlebars設定
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
@@ -26,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // 套用express-session
 app.use(session({
-  secret: "ThisIsMyRestaurants",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
 }))
