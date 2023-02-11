@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const schema = mongoose.Schema
-const restaurantSchema = new schema({
+const Schema = mongoose.Schema
+const restaurantSchema = new Schema({
   name: {type: String, required: true},
   name_en: {type: String, required: true},
   category: {type: String, required: true},
@@ -10,6 +10,13 @@ const restaurantSchema = new schema({
   google_map: {type: String, required: true},
   rating: {type: Number, required: true},
   description: {type: String, required: true},
+  // 加入關聯設定
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    index: true,
+    require: true,
+  }
 })
 
 module.exports = mongoose.model('Restaurant', restaurantSchema)

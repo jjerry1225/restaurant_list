@@ -11,8 +11,9 @@ router.get("/", (req, res) => {
     return res.redirect("/");
   }
   
+  const userId = req.user._id
   const keywords = req.query.keyword.toLocaleLowerCase().trim();
-  Restaurant.find({})
+  Restaurant.find({ userId })
     .lean()
     .then((restaurantData) => {
       const filterRestaurantsData = restaurantData.filter(

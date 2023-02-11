@@ -12,16 +12,18 @@ router.get("/new", (req, res) => {
 
 // route setting：新增餐廳，method = 'POST'
 router.post("/", (req, res) => {
+  const userId = req.user._id
   const newRestaurant = req.body;
-  Restaurant.create(newRestaurant)
+  Restaurant.create({newRestaurant, userId})
     .then(() => res.redirect("/"))
     .catch((err) => console.log(err));
 });
 
 // route setting：show出餐廳詳細資訊
 router.get("/:restaurant_id", (req, res) => {
-  const id = req.params.restaurant_id;
-  Restaurant.findById(id)
+  const userId = req.user._id
+  const _id = req.params.restaurant_id;
+  Restaurant.findOne({_id, userId})
     .lean()
     .then((restaurantData) => res.render("show", { restaurantData }))
     .catch((err) => console.log(err));
@@ -29,8 +31,9 @@ router.get("/:restaurant_id", (req, res) => {
 
 // route setting：編輯餐廳，轉至編輯頁面
 router.get("/:restaurant_id/edit", (req, res) => {
-  const id = req.params.restaurant_id;
-  Restaurant.findById(id)
+  const userId = req.user._id
+  const _id = req.params.restaurant_id;
+  Restaurant.findOne({_id, userId})
     .lean()
     .then((restaurantData) => res.render("edit", { restaurantData }))
     .catch((err) => console.log(err));
@@ -38,8 +41,9 @@ router.get("/:restaurant_id/edit", (req, res) => {
 
 // route setting：編輯餐廳，method = 'PUT'
 router.put("/:restaurant_id", (req, res) => {
-  const id = req.params.restaurant_id;
-  Restaurant.findById(id)
+  const userId = req.user._id
+  const _id = req.params.restaurant_id;
+  Restaurant.findOne({_id, userId})
     .then((restaurantData) => {
       restaurantData.name = req.body.name;
       restaurantData.name_en = req.body.name_en;
@@ -58,8 +62,9 @@ router.put("/:restaurant_id", (req, res) => {
 
 // route setting：刪除餐廳，method = 'DELETE'
 router.delete("/:restaurant_id", (req, res) => {
-  const id = req.params.restaurant_id;
-  Restaurant.findById(id)
+  const userId = req.user._id
+  const _id = req.params.restaurant_id;
+  Restaurant.findOne({_id, userId})
     .then((restaurantData) => {
       restaurantData.remove();
     })
