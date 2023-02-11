@@ -4,6 +4,9 @@ const session = require("express-session")
 const methodOverride = require("method-override");
 const flash = require("connect-flash")
 
+// 載入設定檔，要寫在 express-session 以後
+const usePassport = require("./config/passport")
+
 // 引用連線mongoose的檔案，對 app.js 而言，Mongoose 連線設定只需要「被執行」，不需要接到任何回傳參數繼續利用，所以這裡不需要再設定變數。
 require('./config/mongoose')
 
@@ -33,6 +36,9 @@ app.use(express.static("public"));
 
 // 套用method-override
 app.use(methodOverride("_method"));
+
+// 呼叫 Passport 函式並傳入 app，這條要寫在路由之前
+usePassport(app)
 
 app.use(flash())
 
