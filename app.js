@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
+const session = require("express-session")
 const methodOverride = require("method-override");
+const flash = require("connect-flash")
 
 // 引用連線mongoose的檔案，對 app.js 而言，Mongoose 連線設定只需要「被執行」，不需要接到任何回傳參數繼續利用，所以這裡不需要再設定變數。
 require('./config/mongoose')
@@ -19,11 +21,26 @@ app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 app.use(express.urlencoded({ extended: true }));
 
+// 套用express-session
+app.use(session({
+  secret: "ThisIsMyRestaurants",
+  resave: false,
+  saveUninitialized: true,
+}))
+
 // setting static files
 app.use(express.static("public"));
 
 // 套用method-override
 app.use(methodOverride("_method"));
+
+app.use(flash())
+
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg')
+  res.locals.warning_msg = req.flash('warning_msg')
+  next()
+})
 
 // route setting
 app.use(routes);
