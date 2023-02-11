@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
   if (!req.query.keyword) {
     return res.redirect("/");
   }
-
+  
   const keywords = req.query.keyword.toLocaleLowerCase().trim();
   Restaurant.find({})
     .lean()
