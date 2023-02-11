@@ -56,7 +56,7 @@ router.put("/:restaurant_id", (req, res) => {
       restaurantData.description = req.body.description;
       return restaurantData.save();
     })
-    .then(() => res.redirect(`/restaurants/${id}`))
+    .then(() => res.redirect(`/restaurants/${_id}`))
     .catch((err) => console.log(err));
 });
 
