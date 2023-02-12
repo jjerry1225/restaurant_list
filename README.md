@@ -38,13 +38,13 @@ npm install
 ```
 npm run seed
 ```
-若終端機顯示restaurantSeeder done!即代表成功匯入種子資料，
+若終端機顯示 restaurantSeeder done! 即代表成功匯入種子資料，
 
 完成後，即可接著執行主程式，輸入以下：
 ```
 npm run dev
 ```
-若看見此二行訊息Express is listening on http://localhost:3000與mongodb connected!則代表順利運行，打開瀏覽器進入到以下網址：
+若看見此二行訊息 Express is listening on http://localhost:3000 與 mongodb connected! 則代表順利運行，打開瀏覽器進入到以下網址：
 ```
 http://localhost:3000
 ```
